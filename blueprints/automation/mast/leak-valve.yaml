@@ -1,0 +1,129 @@
+blueprint:
+  name: "Mast: water leak, page then close the valve"
+  description: >-
+    A leak sensor goes wet, Mast pages the phone at page priority, and if
+    nobody has acknowledged by the time the grace period runs out, the main
+    valve closes on its own.
+
+    When the sensor dries again the page is closed from this side with resolve,
+    so the card on the phone turns green and shows how long the incident was
+    open. There is nothing to dismiss.
+  domain: automation
+  author: Tissue Systems
+  source_url: https://github.com/tissue-systems/hass-mast/blob/main/blueprints/automation/mast/leak-valve.yaml
+  input:
+    leak_sensor:
+      name: Leak sensor
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              device_class: moisture
+    valve:
+      name: Main valve
+      description: The switch or valve that shuts the water off.
+      selector:
+        entity:
+          filter:
+            - domain: [switch, valve]
+    channel:
+      name: Mast channel
+      selector:
+        config_entry:
+          integration: mast
+    grace:
+      name: Grace period
+      default: 120
+      selector:
+        number:
+          min: 30
+          max: 1800
+          step: 10
+          unit_of_measurement: s
+          mode: box
+    where:
+      name: Where
+      description: Named on the lock screen, so it can be answered without opening the app.
+      default: the basement
+      selector:
+        text:
+
+mode: single
+max_exceeded: silent
+
+variables:
+  leak_sensor: !input leak_sensor
+  valve: !input valve
+  where: !input where
+  grace: !input grace
+  dedupe_key: "leak-{{ leak_sensor | replace('.', '-') }}"
+
+triggers:
+  - trigger: state
+    entity_id: !input leak_sensor
+    to: "on"
+    id: wet
+  - trigger: state
+    entity_id: !input leak_sensor
+    to: "off"
+    id: dry
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: wet
+        sequence:
+          - action: mast.page
+            data:
+              config_entry_id: !input channel
+              title: "Water detected in {{ where }}"
+              body: >-
+                Closing the main valve in
+                {{ grace ~ ' seconds' if grace < 90 else (grace / 60) | round | int ~ ' minutes' }}
+                unless you acknowledge this.
+              key: "{{ dedupe_key }}"
+              priority: page
+              retry: 30
+              url: >-
+                https://my.home-assistant.io/redirect/entity/?entity_id={{ leak_sensor }}
+              url_title: Open the sensor
+              wait_for_ack: true
+              timeout: !input grace
+            response_variable: answer
+          - if:
+              - condition: template
+                value_template: "{{ not answer.acknowledged }}"
+            then:
+              - action: homeassistant.turn_off
+                target:
+                  entity_id: !input valve
+              - action: mast.send
+                data:
+                  config_entry_id: !input channel
+                  title: "Main valve closed"
+                  body: >-
+                    Nobody answered, so the water is off. Turn it back on when
+                    {{ where }} is dry.
+                  key: "{{ dedupe_key }}-valve"
+                  priority: loud
+
+      - conditions:
+          - condition: trigger
+            id: dry
+        sequence:
+          - action: mast.resolve
+            data:
+              config_entry_id: !input channel
+              key: "{{ dedupe_key }}"
+              title: "{{ where | capitalize }} is dry"
+              body: The leak sensor cleared.
+            response_variable: closed
+          - action: logbook.log
+            data:
+              name: Mast
+              message: >-
+                Leak page closed after
+                {{ closed.open_for if closed.open_for is not none else 'an unknown time' }}
+                seconds.
+              entity_id: "{{ leak_sensor }}"

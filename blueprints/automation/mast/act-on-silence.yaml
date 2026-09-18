@@ -1,0 +1,95 @@
+blueprint:
+  name: "Mast: act on silence"
+  description: >-
+    Page a phone and, if nobody acknowledges before the grace period runs out,
+    go ahead and do the safe thing without them.
+
+    This is the shape of any automation written as "notify, wait five minutes,
+    act", with the difference that answering the page calls it off.
+  domain: automation
+  author: Tissue Systems
+  source_url: https://github.com/tissue-systems/hass-mast/blob/main/blueprints/automation/mast/act-on-silence.yaml
+  input:
+    trigger_block:
+      name: When
+      selector:
+        trigger:
+    channel:
+      name: Mast channel
+      selector:
+        config_entry:
+          integration: mast
+    title:
+      name: Title
+      selector:
+        text:
+    body:
+      name: Body
+      description: Say what will happen, and when, so it reads on the lock screen.
+      selector:
+        text:
+          multiline: true
+    dedupe_key:
+      name: Deduplication key
+      default: ha-deadman
+      selector:
+        text:
+    grace:
+      name: Grace period
+      description: How long somebody has to call this off.
+      default: 120
+      selector:
+        number:
+          min: 10
+          max: 3600
+          step: 10
+          unit_of_measurement: s
+          mode: box
+    fallback:
+      name: Do this on silence
+      selector:
+        action:
+    tell_them:
+      name: Then say what was done
+      description: >-
+        Send a second message once the fallback has run, so the phone's record
+        matches what actually happened.
+      default: true
+      selector:
+        boolean:
+
+mode: single
+max_exceeded: silent
+
+triggers: !input trigger_block
+
+variables:
+  key: !input dedupe_key
+  send_followup: !input tell_them
+
+actions:
+  - action: mast.page
+    data:
+      config_entry_id: !input channel
+      title: !input title
+      body: !input body
+      key: !input dedupe_key
+      priority: page
+      wait_for_ack: true
+      timeout: !input grace
+    response_variable: answer
+  - condition: template
+    value_template: "{{ not answer.acknowledged }}"
+  - sequence: !input fallback
+  - if:
+      - condition: template
+        value_template: "{{ send_followup }}"
+    then:
+      - action: mast.send
+        data:
+          config_entry_id: !input channel
+          title: "No answer"
+          body: >-
+            Nobody acknowledged, so Home Assistant went ahead.
+          key: "{{ key }}-done"
+          priority: normal

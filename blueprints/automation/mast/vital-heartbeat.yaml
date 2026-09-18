@@ -1,0 +1,61 @@
+blueprint:
+  name: "Mast: vital heartbeat"
+  description: >-
+    Beat on a Mast vital channel on a schedule. Mast pages you when the beats
+    stop, which is how you find out Home Assistant itself has gone down.
+
+    Set the channel's grace period in the Mast app a little longer than the
+    interval here. The integration can beat on its own from the channel's
+    options; use this blueprint instead when the beat should depend on a
+    condition, such as beating only while some sensor is still reporting.
+  domain: automation
+  author: Tissue Systems
+  source_url: https://github.com/tissue-systems/hass-mast/blob/main/blueprints/automation/mast/vital-heartbeat.yaml
+  input:
+    channel:
+      name: Mast vital channel
+      description: A channel set to Vital in the Mast app.
+      selector:
+        config_entry:
+          integration: mast
+    interval:
+      name: Beat every
+      default: "/5"
+      selector:
+        select:
+          options:
+            - label: Every minute
+              value: "/1"
+            - label: Every 2 minutes
+              value: "/2"
+            - label: Every 5 minutes
+              value: "/5"
+            - label: Every 10 minutes
+              value: "/10"
+            - label: Every 15 minutes
+              value: "/15"
+            - label: Every 30 minutes
+              value: "/30"
+    healthy:
+      name: Only beat while
+      description: >-
+        Leave this empty to beat unconditionally. Add a condition and Mast
+        pages you once it stops holding.
+      default: []
+      selector:
+        condition:
+
+mode: single
+max_exceeded: silent
+
+triggers:
+  - trigger: time_pattern
+    minutes: !input interval
+
+conditions: !input healthy
+
+actions:
+  - action: mast.ping
+    data:
+      config_entry_id: !input channel
+      body: "Home Assistant is up."

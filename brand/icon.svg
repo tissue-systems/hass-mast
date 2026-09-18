@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 596 596" width="596" height="596">
+  <!-- The Mast wall: eight vitals checking in, one ringing. Traced from the iOS
+       app icon (mast-ios/.../AppIcon.appiconset/icon-light-1024.png) at a 1024 px
+       scale, trimmed to the artwork, background dropped so the tile sits on
+       either Home Assistant theme. -->
+  <g fill="#2fbd8f">
+    <circle cx="58" cy="58" r="58.5"/>
+    <circle cx="298" cy="58" r="58.5"/>
+    <circle cx="538" cy="58" r="58.5"/>
+    <circle cx="58" cy="298" r="58.5"/>
+    <circle cx="538" cy="298" r="58.5"/>
+    <circle cx="58" cy="538" r="58.5"/>
+    <circle cx="298" cy="538" r="58.5"/>
+    <circle cx="538" cy="538" r="58.5"/>
+  </g>
+  <circle cx="298" cy="298" r="98.5" fill="none" stroke="#ff453a" stroke-opacity=".55" stroke-width="15"/>
+  <circle cx="298" cy="298" r="58.5" fill="#ff453a"/>
+</svg>

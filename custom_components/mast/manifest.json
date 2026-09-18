@@ -1,0 +1,12 @@
+{
+  "domain": "mast",
+  "name": "Mast",
+  "codeowners": ["@ki7dk"],
+  "config_flow": true,
+  "documentation": "https://github.com/tissue-systems/hass-mast",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/tissue-systems/hass-mast/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

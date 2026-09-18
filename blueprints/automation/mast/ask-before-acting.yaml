@@ -1,0 +1,85 @@
+blueprint:
+  name: "Mast: ask before acting"
+  description: >-
+    Page a phone, wait for somebody to acknowledge it on the lock screen, then
+    run one set of actions if they did and another if they didn't.
+
+    The waiting happens on Mast's side, so this works while the phone is locked
+    and in a Focus, and while Home Assistant isn't reachable from the internet.
+  domain: automation
+  author: Tissue Systems
+  source_url: https://github.com/tissue-systems/hass-mast/blob/main/blueprints/automation/mast/ask-before-acting.yaml
+  input:
+    trigger_block:
+      name: When
+      description: What starts the automation.
+      selector:
+        trigger:
+    channel:
+      name: Mast channel
+      selector:
+        config_entry:
+          integration: mast
+    title:
+      name: Title
+      default: "Home Assistant needs an answer"
+      selector:
+        text:
+    body:
+      name: Body
+      description: Say what happens if nobody answers. That is what gets read on the lock screen.
+      selector:
+        text:
+          multiline: true
+    dedupe_key:
+      name: Deduplication key
+      description: >-
+        Re-triggers fold onto one card instead of stacking up. Only worth
+        changing if two of these automations share a channel.
+      default: ha-ask
+      selector:
+        text:
+    timeout:
+      name: Wait this long
+      default: 120
+      selector:
+        number:
+          min: 10
+          max: 3600
+          step: 10
+          unit_of_measurement: s
+          mode: box
+    on_acknowledged:
+      name: If they answered
+      default: []
+      selector:
+        action:
+    on_no_answer:
+      name: If nobody answered
+      description: What to do on your own when nobody answers.
+      default: []
+      selector:
+        action:
+
+mode: single
+max_exceeded: silent
+
+triggers: !input trigger_block
+
+actions:
+  - action: mast.page
+    data:
+      config_entry_id: !input channel
+      title: !input title
+      body: !input body
+      key: !input dedupe_key
+      priority: page
+      wait_for_ack: true
+      timeout: !input timeout
+    response_variable: answer
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ answer.acknowledged }}"
+        sequence: !input on_acknowledged
+    default: !input on_no_answer

@@ -1,0 +1,235 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a Mast channel",
+        "description": "Paste the channel URL from the Mast app (Channels → tap a channel → Copy URL). Anything holding that URL can page this phone, so treat it like a password.",
+        "data": {
+          "channel_url": "Channel URL",
+          "channel_name": "Name",
+          "heartbeat": "Send a heartbeat to this channel",
+          "heartbeat_interval": "Heartbeat interval"
+        },
+        "data_description": {
+          "channel_name": "What this phone is called in entity names and automations.",
+          "heartbeat": "On a channel set to Vital in the Mast app, Mast pages you when the beats stop. That is how you find out Home Assistant itself is down.",
+          "heartbeat_interval": "Set the channel's grace period in the Mast app a little longer than this."
+        }
+      },
+      "reconfigure": {
+        "title": "Update the channel key",
+        "description": "A disconnect in the Mast app re-mints every channel key. Paste the new URL for the same channel and the entities stay as they are.",
+        "data": {
+          "channel_url": "Channel URL"
+        }
+      }
+    },
+    "error": {
+      "malformed_url": "That doesn't look like a Mast channel URL or key. Copy the channel URL from the Mast app and paste the whole thing, or paste just the key it ends with.",
+      "unknown_channel": "Mast doesn't know this key. If the phone was reinstalled or disconnected, copy the channel URL again.",
+      "rate_limited": "Mast is rate-limiting this key. Wait a minute and try again.",
+      "cannot_connect": "Could not reach Mast."
+    },
+    "abort": {
+      "already_configured": "That channel is already set up.",
+      "wrong_channel": "That URL is for a different channel. Add it as a new one instead.",
+      "reconfigure_successful": "The channel key was updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mast options",
+        "data": {
+          "heartbeat": "Send a heartbeat to this channel",
+          "heartbeat_interval": "Heartbeat interval"
+        },
+        "data_description": {
+          "heartbeat": "On a channel set to Vital in the Mast app, Mast pages you when the beats stop."
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "page_open": {
+        "name": "Page open"
+      }
+    },
+    "sensor": {
+      "open_pages": {
+        "name": "Open pages"
+      },
+      "last_acked_by": {
+        "name": "Last acknowledged by"
+      },
+      "last_time_to_ack": {
+        "name": "Last time to acknowledge"
+      }
+    },
+    "event": {
+      "answer": {
+        "name": "Answer",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "acknowledged": "Acknowledged",
+              "resolved": "Resolved",
+              "expired": "Expired"
+            }
+          }
+        }
+      }
+    }
+  },
+  "selector": {
+    "priority": {
+      "options": {
+        "quiet": "Quiet: no sound, no banner",
+        "normal": "Normal: an ordinary notification",
+        "loud": "Loud: breaks through a Focus, obeys the ringer switch",
+        "page": "Page: sounds with the ringer switch off, and repeats"
+      }
+    }
+  },
+  "services": {
+    "send": {
+      "name": "Send",
+      "description": "Send a message to the phone. Use Page instead when somebody has to answer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Channel",
+          "description": "Which Mast channel to send on. Optional when only one is set up."
+        },
+        "title": { "name": "Title", "description": "The line on the lock screen." },
+        "body": { "name": "Body", "description": "The rest of the message." },
+        "priority": {
+          "name": "Priority",
+          "description": "How far the message is allowed to break through. Page is the only one that repeats."
+        },
+        "url": {
+          "name": "URL",
+          "description": "An https link the notification opens. A my.home-assistant.io redirect link opens the companion app on the right screen."
+        },
+        "url_title": { "name": "Link text", "description": "The label on the link." },
+        "key": {
+          "name": "Deduplication key",
+          "description": "Two messages with the same key fold into one. Also what Resolve closes."
+        },
+        "sound": { "name": "Sound", "description": "The alert sound to use." },
+        "retry": {
+          "name": "Repeat every",
+          "description": "Keep re-alerting this often until it is acknowledged."
+        },
+        "expire": {
+          "name": "Expire after",
+          "description": "Stop repeating after this long, answered or not."
+        },
+        "ack": {
+          "name": "Require acknowledgement",
+          "description": "Ask for an acknowledgement without waiting for it. The answer arrives as an event."
+        },
+        "silent": {
+          "name": "Silent",
+          "description": "Deliver without a sound, whatever the priority."
+        }
+      }
+    },
+    "page": {
+      "name": "Page",
+      "description": "Page somebody and wait for them to acknowledge it on their phone. Returns whether it was answered, by which device, and how long it took.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Channel",
+          "description": "Which Mast channel to page. Optional when only one is set up."
+        },
+        "title": { "name": "Title", "description": "The line on the lock screen." },
+        "body": {
+          "name": "Body",
+          "description": "The rest of the message. Say what happens if nobody answers."
+        },
+        "priority": {
+          "name": "Priority",
+          "description": "Defaults to Page, which sounds with the ringer switch off and repeats until somebody answers."
+        },
+        "url": {
+          "name": "URL",
+          "description": "An https link the notification opens."
+        },
+        "url_title": { "name": "Link text", "description": "The label on the link." },
+        "key": {
+          "name": "Deduplication key",
+          "description": "Re-paging with the same key folds into the open page instead of stacking another."
+        },
+        "sound": { "name": "Sound", "description": "The alert sound to use." },
+        "retry": {
+          "name": "Repeat every",
+          "description": "Keep re-alerting this often until it is acknowledged."
+        },
+        "expire": {
+          "name": "Expire after",
+          "description": "Stop repeating after this long, answered or not."
+        },
+        "wait_for_ack": {
+          "name": "Wait for the answer",
+          "description": "Hold the automation until somebody acknowledges or the timeout passes. Turn this off to page and carry on; the answer still arrives as an event."
+        },
+        "timeout": {
+          "name": "Timeout",
+          "description": "How long to wait. Running out doesn't cancel the page, and a later acknowledgement still fires the event."
+        }
+      }
+    },
+    "resolve": {
+      "name": "Resolve",
+      "description": "Close an open page because the condition cleared. Use this rather than acknowledging on somebody's behalf.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Channel",
+          "description": "Which Mast channel the page is on."
+        },
+        "key": {
+          "name": "Deduplication key",
+          "description": "Closes whatever is open under this key."
+        },
+        "message_id": {
+          "name": "Message ID",
+          "description": "Closes one specific page, as returned by Send or Page."
+        },
+        "title": { "name": "Title", "description": "What the all-clear says." },
+        "body": { "name": "Body", "description": "The rest of the all-clear." }
+      }
+    },
+    "ping": {
+      "name": "Heartbeat",
+      "description": "Send one beat to a vital channel. Mast pages you when the beats stop.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Channel",
+          "description": "Which Mast channel to beat on."
+        },
+        "body": { "name": "Body", "description": "Optional note carried with the beat." }
+      }
+    },
+    "status": {
+      "name": "Status",
+      "description": "Ask Mast what became of one message.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Channel",
+          "description": "Which Mast channel the message is on."
+        },
+        "message_id": {
+          "name": "Message ID",
+          "description": "The id returned by Send or Page."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_channel": { "message": "No Mast channel is configured." },
+    "ambiguous_channel": {
+      "message": "More than one Mast channel is configured; name one with config_entry_id."
+    }
+  }
+}

@@ -1,0 +1,209 @@
+send:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mast
+    title:
+      required: false
+      example: "Freezer warming"
+      selector:
+        text:
+    body:
+      required: false
+      example: "Garage freezer is at -8 C and rising."
+      selector:
+        text:
+          multiline: true
+    priority:
+      required: false
+      default: normal
+      selector:
+        select:
+          translation_key: priority
+          options:
+            - quiet
+            - normal
+            - loud
+            - page
+    url:
+      required: false
+      example: "https://my.home-assistant.io/redirect/entity/?entity_id=sensor.freezer"
+      selector:
+        text:
+          type: url
+    url_title:
+      required: false
+      selector:
+        text:
+    key:
+      required: false
+      example: "freezer-warm"
+      selector:
+        text:
+    sound:
+      required: false
+      selector:
+        text:
+    retry:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 86400
+          step: 30
+          unit_of_measurement: s
+          mode: box
+    expire:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 604800
+          step: 60
+          unit_of_measurement: s
+          mode: box
+    ack:
+      required: false
+      default: false
+      selector:
+        boolean:
+    silent:
+      required: false
+      default: false
+      selector:
+        boolean:
+
+page:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mast
+    title:
+      required: false
+      example: "Freezer warming"
+      selector:
+        text:
+    body:
+      required: false
+      example: "Garage freezer is at -8 C and rising."
+      selector:
+        text:
+          multiline: true
+    priority:
+      required: false
+      default: page
+      selector:
+        select:
+          translation_key: priority
+          options:
+            - quiet
+            - normal
+            - loud
+            - page
+    url:
+      required: false
+      example: "https://my.home-assistant.io/redirect/entity/?entity_id=sensor.freezer"
+      selector:
+        text:
+          type: url
+    url_title:
+      required: false
+      selector:
+        text:
+    key:
+      required: false
+      example: "freezer-warm"
+      selector:
+        text:
+    sound:
+      required: false
+      selector:
+        text:
+    retry:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 86400
+          step: 30
+          unit_of_measurement: s
+          mode: box
+    expire:
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 604800
+          step: 60
+          unit_of_measurement: s
+          mode: box
+    wait_for_ack:
+      required: false
+      default: true
+      selector:
+        boolean:
+    timeout:
+      required: false
+      default: 300
+      selector:
+        number:
+          min: 1
+          max: 86400
+          step: 1
+          unit_of_measurement: s
+          mode: box
+
+resolve:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mast
+    key:
+      required: false
+      example: "freezer-warm"
+      selector:
+        text:
+    message_id:
+      required: false
+      example: "mm_0f3c9a1b2d4e5f60718293a4b5c6d7e8"
+      selector:
+        text:
+    title:
+      required: false
+      selector:
+        text:
+    body:
+      required: false
+      selector:
+        text:
+
+ping:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mast
+    body:
+      required: false
+      selector:
+        text:
+
+status:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: mast
+    message_id:
+      required: true
+      example: "mm_0f3c9a1b2d4e5f60718293a4b5c6d7e8"
+      selector:
+        text:

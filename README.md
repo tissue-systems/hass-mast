@@ -17,8 +17,8 @@ of this needs your instance to be reachable from the internet. The heartbeat run
 if Home Assistant stops checking in, Mast pages you, which is the one alarm your instance can't
 raise for itself.
 
-Mast is a one-time purchase, $4.99 in the US App Store. No subscription, no per-message charge.
-iPhone, iOS 17.2 or later.
+Mast Pager is free on the App Store, with no account needed and no per-message charge.
+iPhone, iOS 17.2 or later. The Android app is coming soon.
 
 [![Download Mast Pager on the App Store](brand/app-store-badge.svg)](https://apps.apple.com/app/id6805232044?pt=129362925&ct=hass-readme&mt=8)
 

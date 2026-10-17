@@ -4,7 +4,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
 [![License](https://img.shields.io/github/license/tissue-systems/hass-mast.svg)](LICENSE)
 
-Home Assistant integration for [Mast](https://tissue.systems/mast), a pager app for the iPhone.
+Home Assistant integration for [Mast](https://tissue.systems/mast), a pager app for iPhone and Android.
 
 It adds a `mast.page` action that sends a message and then waits for a person to acknowledge it
 before the automation carries on. That covers the automations a normal notification can't: a leak
@@ -17,10 +17,12 @@ of this needs your instance to be reachable from the internet. The heartbeat run
 if Home Assistant stops checking in, Mast pages you, which is the one alarm your instance can't
 raise for itself.
 
-Mast Pager is free on the App Store, with no account needed and no per-message charge.
-iPhone, iOS 17.2 or later. The Android app is coming soon.
+Mast Pager is free on the App Store and Google Play, with no account needed and no per-message
+charge. iPhone with iOS 17.2 or later, or Android 12 or later.
 
 [![Download Mast Pager on the App Store](brand/app-store-badge.svg)](https://apps.apple.com/app/id6805232044?pt=129362925&ct=hass-readme&mt=8)
+
+[Get Mast Pager on Google Play](https://play.google.com/store/apps/details?id=systems.tissue.mast)
 
 ## Requirements
 

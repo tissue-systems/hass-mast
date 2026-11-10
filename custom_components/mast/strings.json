@@ -32,7 +32,6 @@
     },
     "abort": {
       "already_configured": "That channel is already set up.",
-      "wrong_channel": "That URL is for a different channel. Add it as a new one instead.",
       "reconfigure_successful": "The channel key was updated."
     }
   },

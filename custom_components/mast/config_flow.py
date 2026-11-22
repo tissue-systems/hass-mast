@@ -137,18 +137,27 @@ class MastConfigFlow(ConfigFlow, domain=DOMAIN):
             except MastError:
                 errors[CONF_CHANNEL_URL] = "malformed_url"
             else:
+                # The unique id is the channel key, and a re-minted key is by
+                # definition a different key, so the entry's unique id moves
+                # with it. The only key that must be refused is one another
+                # entry already holds; pasting this entry's own key again is a
+                # harmless no-op, and the helper would count it as a duplicate.
+                await self.async_set_unique_id(target.key)
+                if target.key != entry.unique_id:
+                    self._abort_if_unique_id_configured()
                 client = MastClient(async_get_clientsession(self.hass), target)
                 try:
                     await client.validate()
                 except MastUnknownChannel:
                     errors[CONF_CHANNEL_URL] = "unknown_channel"
+                except MastRateLimited:
+                    errors["base"] = "rate_limited"
                 except MastError:
                     errors["base"] = "cannot_connect"
                 else:
-                    await self.async_set_unique_id(target.key)
-                    self._abort_if_unique_id_mismatch(reason="wrong_channel")
                     return self.async_update_reload_and_abort(
                         entry,
+                        unique_id=target.key,
                         data_updates={CONF_CHANNEL_URL: target.send_url},
                     )
 
